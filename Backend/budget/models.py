@@ -1,8 +1,7 @@
 from django.db import models
 from django.conf import settings
 from user.models import CustomUser  
- 
- 
+
 class BudgetCategory(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='budget_categories', null=True)  # Allow null temporarily
     category = models.CharField(max_length=100)

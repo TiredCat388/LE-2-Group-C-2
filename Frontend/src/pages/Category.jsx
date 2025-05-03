@@ -5,6 +5,7 @@ import Navbar from "../components/navbar";
 import { budgetApi } from "../utils/api";
 
 const Categories = () => {
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +28,14 @@ const Categories = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Fetch categories from backend
+    fetch("http://127.0.0.1:8000/api/categories/")
+      .then((res) => res.json())
+      .then((data) => setCategories(data))
+      .catch((err) => console.error("Failed to fetch categories:", err));
+  }, []);
 
   const handleClick = (category) => {
     navigate(`/category/${category.category}`, { state: category });
