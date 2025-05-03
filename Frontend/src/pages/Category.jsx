@@ -1,25 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Category.css";
 import Navbar from "../components/navbar";
-import rentImage from "../assets/rent.jpg";
-
-const categories = [
-  { title: "Rent", amount: 1000, image: rentImage },
-  { title: "Groceries", amount: 440, image: rentImage },
-  { title: "Dining Out", amount: 5, image: rentImage },
-  { title: "Transportation", amount: 80, image: rentImage },
-  { title: "Entertainment", amount: 120, image: rentImage },
-  { title: "Shopping", amount: 150, image: rentImage },
-  { title: "Gym", amount: 75, image: rentImage },
-  { title: "Insurance", amount: 200, image: rentImage },
-];
 
 const Categories = () => {
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Fetch categories from backend
+    fetch("http://127.0.0.1:8000/api/categories/")
+      .then((res) => res.json())
+      .then((data) => setCategories(data))
+      .catch((err) => console.error("Failed to fetch categories:", err));
+  }, []);
+
   const handleClick = (category) => {
-    navigate(`/category/${category.title}`, { state: category });
+    navigate(`/category/${category.category}`, { state: category });
   };
 
   return (
@@ -49,10 +46,22 @@ const Categories = () => {
               key={index}
               onClick={() => handleClick(cat)}
             >
-              <img src={cat.image} alt={cat.title} />
+              <img
+                src={
+                  cat.image
+                    ? cat.image
+                    : "http://localhost:8000/media/budget_images"
+                }
+                alt={cat.category}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "http://localhost:8000/media/budget_images"; // Fallback image
+                }}
+              />
               <div className="info">
-                <h3>{cat.title}</h3>
-                <p>${cat.amount}</p>
+                <h3>{cat.category}</h3>
+                <p>${cat.limit}</p>
               </div>
             </div>
           ))}
