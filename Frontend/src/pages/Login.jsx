@@ -45,6 +45,11 @@ const Login = () => {
       .then((data) => {
         console.log("Login successful:", data);
 
+        // Store the authentication token
+        if (data.token) {
+          sessionStorage.setItem('authToken', data.token);
+        }
+
         // Handle remember me functionality
         if (rememberMe) {
           localStorage.setItem("rememberedEmail", email);

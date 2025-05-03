@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -14,71 +14,105 @@ import {
 } from "recharts";
 import Navbar from "../components/navbar";
 import "./Summary.css"; // Custom styles
-
-const summaryData = [
-  { label: "YTD Expenses", value: "$22,842" },
-  { label: "YTD Savings", value: "$7,408" },
-  { label: "Monthly Average", value: "$2,077" },
-  { label: "Monthly Budget", value: "$2,750" },
-];
-
-const lineData = [
-  { name: "Jan", Budget: 2000, Expenses: 1700, Savings: 300 },
-  { name: "Feb", Budget: 2000, Expenses: 1687, Savings: 313 },
-  { name: "Mar", Budget: 2200, Expenses: 2400, Savings: -200 },
-  { name: "Apr", Budget: 2200, Expenses: 2046, Savings: 154 },
-  { name: "May", Budget: 2200, Expenses: 1315, Savings: 885 },
-  { name: "Jun", Budget: 2300, Expenses: 2123, Savings: 177 },
-  { name: "Jul", Budget: 2300, Expenses: 2186, Savings: 114 },
-  { name: "Aug", Budget: 2500, Expenses: 2500, Savings: 0 },
-  { name: "Sep", Budget: 2500, Expenses: 2300, Savings: 200 },
-  { name: "Oct", Budget: 2300, Expenses: 2100, Savings: 200 },
-  { name: "Nov", Budget: 2750, Expenses: 2701, Savings: 49 },
-];
-
-const pieData = [
-  { name: "Rent", value: 12000 },
-  { name: "Groceries", value: 1299 },
-  { name: "Dining Out", value: 1205 },
-  { name: "Transportation", value: 600 },
-  { name: "Entertainment", value: 700 },
-  { name: "Shopping", value: 605 },
-  { name: "Gym", value: 500 },
-  { name: "Insurance", value: 1300 },
-  { name: "Loan Payments", value: 2400 },
-  { name: "Miscellaneous", value: 100 },
-];
-
-const tableData = [
-  { month: "January", expenses: "$1,761", savings: "$353" },
-  { month: "February", expenses: "$1,687", savings: "$313" },
-  { month: "March", expenses: "$2,400", savings: "$-200" },
-  { month: "April", expenses: "$2,046", savings: "$154" },
-  { month: "May", expenses: "$1,315", savings: "$885" },
-  { month: "June", expenses: "$2,123", savings: "$177" },
-  { month: "July", expenses: "$2,186", savings: "$114" },
-  { month: "August", expenses: "$2,500", savings: "$0" },
-  { month: "September", expenses: "$2,300", savings: "$200" },
-  { month: "October", expenses: "$2,100", savings: "$200" },
-  { month: "November", expenses: "$2,701", savings: "$49" },
-];
-
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#AB47BC",
-  "#26A69A",
-  "#FFA726",
-  "#EF5350",
-  "#78909C",
-  "#8D6E63",
-];
+import { fetchWithAuth } from "../utils/api";
 
 function App() {
-  const [month, setMonth] = useState("2022-11");
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [entries, setEntries] = useState([]);
+  const [summaryData, setSummaryData] = useState([]);
+  const [lineData, setLineData] = useState([]);
+  const [pieData, setPieData] = useState([]);
+  const [tableData, setTableData] = useState([]);
+
+  useEffect(() => {
+    fetchEntries();
+  }, [month]);
+
+  const fetchEntries = async () => {
+    try {
+      const response = await fetchWithAuth('http://localhost:8000/api/entries/');
+      if (response) {
+        const data = await response.json();
+        setEntries(data);
+        processData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching entries:', error);
+    }
+  };
+
+  const processData = (entries) => {
+    // Filter entries for the selected month
+    const monthEntries = entries.filter(entry => 
+      entry.date.startsWith(month)
+    );
+
+    // Calculate summary data
+    const totalExpenses = monthEntries
+      .filter(entry => entry.type === 'expense')
+      .reduce((sum, entry) => sum + parseFloat(entry.amount), 0);
+
+    const totalIncome = monthEntries
+      .filter(entry => entry.type === 'income')
+      .reduce((sum, entry) => sum + parseFloat(entry.amount), 0);
+
+    const savings = totalIncome - totalExpenses;
+
+    setSummaryData([
+      { label: "Monthly Expenses", value: `$${totalExpenses.toFixed(2)}` },
+      { label: "Monthly Income", value: `$${totalIncome.toFixed(2)}` },
+      { label: "Monthly Savings", value: `$${savings.toFixed(2)}` },
+      { label: "Savings Rate", value: `${((savings / totalIncome) * 100).toFixed(1)}%` },
+    ]);
+
+    // Process pie chart data (expenses by category)
+    const categoryTotals = {};
+    monthEntries
+      .filter(entry => entry.type === 'expense')
+      .forEach(entry => {
+        categoryTotals[entry.category] = (categoryTotals[entry.category] || 0) + parseFloat(entry.amount);
+      });
+
+    const pieChartData = Object.entries(categoryTotals).map(([name, value]) => ({
+      name,
+      value: parseFloat(value.toFixed(2))
+    }));
+
+    setPieData(pieChartData);
+
+    // Process line chart data (monthly trends)
+    const monthlyData = {};
+    entries.forEach(entry => {
+      const month = entry.date.slice(0, 7);
+      if (!monthlyData[month]) {
+        monthlyData[month] = { income: 0, expenses: 0 };
+      }
+      if (entry.type === 'income') {
+        monthlyData[month].income += parseFloat(entry.amount);
+      } else {
+        monthlyData[month].expenses += parseFloat(entry.amount);
+      }
+    });
+
+    const lineChartData = Object.entries(monthlyData).map(([month, data]) => ({
+      name: month,
+      Income: data.income,
+      Expenses: data.expenses,
+      Savings: data.income - data.expenses
+    }));
+
+    setLineData(lineChartData);
+
+    // Process table data
+    const tableChartData = Object.entries(monthlyData).map(([month, data]) => ({
+      month,
+      expenses: `$${data.expenses.toFixed(2)}`,
+      savings: `$${(data.income - data.expenses).toFixed(2)}`
+    }));
+
+    setTableData(tableChartData);
+  };
 
   const handleMouseEnter = (index) => {
     setHoveredIndex(index);
@@ -87,6 +121,11 @@ function App() {
   const handleMouseLeave = () => {
     setHoveredIndex(null);
   };
+
+  const COLORS = [
+    "#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AB47BC",
+    "#26A69A", "#FFA726", "#EF5350", "#78909C", "#8D6E63"
+  ];
 
   return (
     <div className="app">
@@ -109,7 +148,7 @@ function App() {
         </div>
         <div className="charts">
           <div className="chart-box">
-            <h2>YTD Savings Summary</h2>
+            <h2>Monthly Trends</h2>
             <LineChart width={500} height={260} data={lineData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
@@ -118,9 +157,9 @@ function App() {
               <Legend />
               <Line
                 type="monotone"
-                dataKey="Budget"
+                dataKey="Income"
                 stroke="#8884d8"
-                animationDuration={1500} // Animation duration in milliseconds
+                animationDuration={1500}
               />
               <Line
                 type="monotone"
@@ -159,35 +198,7 @@ function App() {
                       />
                     ))}
                   </Pie>
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        const { name, value } = payload[0].payload;
-                        const total = pieData.reduce((sum, item) => sum + item.value, 0);
-                        const percentage = ((value / total) * 100).toFixed(2);
-                        return (
-                          <div className="custom-tooltip" style={{ background: "white", padding: "10px", borderRadius: "5px", boxShadow: "0 2px 5px rgba(0,0,0,0.2)" }}>
-                            <div style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
-                              <span
-                                style={{
-                                  display: "inline-block",
-                                  width: "12px",
-                                  height: "12px",
-                                  backgroundColor: COLORS[hoveredIndex % COLORS.length],
-                                  borderRadius: "50%",
-                                  marginRight: "5px",
-                                }}
-                              ></span>
-                              <span>{name}</span>
-                            </div>
-                            <div>${value.toLocaleString()}</div>
-                            <div style={{ color: "#888" }}>{percentage}%</div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
+                  <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
               <div className="piechart-legend">
@@ -205,7 +216,7 @@ function App() {
           </div>
         </div>
         <div className="table-section">
-          <h2>Costs this Year</h2>
+          <h2>Monthly Overview</h2>
           <table>
             <thead>
               <tr>
