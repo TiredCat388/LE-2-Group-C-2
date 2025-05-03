@@ -1,23 +1,37 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/navbar";
 import "./Categorydeets.css";
 
 const CategoryDetail = () => {
+  const { id } = useParams(); // category ID from URL
   const location = useLocation();
   const navigate = useNavigate();
-  const category = location.state;
+  const [category, setCategory] = useState(location.state || null);
   const [showDrawer, setShowDrawer] = useState(false);
+
+  useEffect(() => {
+    if (!category) {
+      const fetchCategory = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:8000/api/budgets/${id}/`
+          );
+          const data = await response.json();
+          setCategory(data);
+        } catch (error) {
+          console.error("Error fetching category:", error);
+        }
+      };
+
+      fetchCategory();
+    }
+  }, [id, category]);
 
   if (!category) return <p className="no-data">No data found.</p>;
 
-  const handleAddClick = () => {
-    setShowDrawer(true);
-  };
-
-  const handleCloseDrawer = () => {
-    setShowDrawer(false);
-  };
+  const handleAddClick = () => setShowDrawer(true);
+  const handleCloseDrawer = () => setShowDrawer(false);
 
   return (
     <div className="category-page">
@@ -32,22 +46,30 @@ const CategoryDetail = () => {
             Categories
           </span>
           <span className="breadcrumb-separator">›</span>
-          <span className="breadcrumb-current">{category.title}</span>
+          <span className="breadcrumb-current">{category.category}</span>
         </div>
 
         {/* Header */}
         <div className="category-header">
           <img
-            src={category.image}
-            alt={category.title}
+            src={
+              category.image ||
+              "http://localhost:8000/media/budget_images/rent.jpg"
+            }
+            alt={category.category}
             className="category-image"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src =
+                "http://localhost:8000/media/budget_images/rent.jpg";
+            }}
           />
           <div className="category-info">
-            <h2 className="category-title">{category.title}</h2>
+            <h2 className="category-title">{category.category}</h2>
             <p className="category-description">
-              Your monthly limit for <span>{category.title}</span> is{" "}
-              <span>${category.amount}</span>, and you have spent{" "}
-              <span>${category.amount}</span>.
+              Your monthly limit for <span>{category.category}</span> is{" "}
+              <span>${parseFloat(category.limit).toFixed(2)}</span>, and you
+              have spent <span>${parseFloat(category.limit).toFixed(2)}</span>.
             </p>
             <div className="budget-section">
               <label>Budget Remaining</label>
@@ -80,7 +102,7 @@ const CategoryDetail = () => {
               <tbody>
                 <tr>
                   <td>Apartment Rent</td>
-                  <td>${category.amount.toFixed(2)}</td>
+                  <td>${parseFloat(category.limit).toFixed(2)}</td>
                   <td>11/21/2022</td>
                 </tr>
               </tbody>
@@ -98,12 +120,7 @@ const CategoryDetail = () => {
         </div>
         <form className="drawer-form">
           <label>Category</label>
-          <input
-            type="text"
-            placeholder="Category"
-            disabled
-            value={category.title}
-          />
+          <input type="text" disabled value={category.category} />
           <label>Description</label>
           <input type="text" placeholder="Description" />
           <label>Expense</label>
