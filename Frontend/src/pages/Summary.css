@@ -1,13 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+
+#root {
+  overflow-y: auto;
+}
 
 #root {
   overflow-y: auto;
 }
 
 body {
-  background-color: #121212;
+  background-color: #00d2a3;
   color: white;
-  font-family: sans-serif;
+  font-family: 'Quicksand', sans-serif;
   margin: 0;
   padding: 20px;
   box-sizing: border-box;
@@ -24,43 +28,55 @@ body {
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 10rem;
   margin: 1rem 1.5rem 0 0.5rem;
 }
 
 .summary-container {
   display: flex;
+  font-family: 'Quicksand', sans-serif;
   flex-direction: column;
   align-items: center;
   padding: 20px;
   padding-top: 4rem;
   border-radius: 8px;
+  background-color: #F1FFF3;
 }
 
 .month-picker {
-  font-family: 'Inter', sans-serif;
-  width: 90%;
+  font-family:  'Quicksand', sans-serif;
+  width: 870px;         /* Set a fixed width */
+  max-width: 100%;      /* Prevent overflow on small screens */
   padding: 10px;
   margin-bottom: 20px;
   border-radius: 5px;
   font-size: 1rem;
   border: none;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;   /* Center the input */
 }
 
 .summary-cards {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  justify-content: center;   /* Center the cards horizontally */
+  align-items: stretch;      /* Make all cards the same height */
+  width: 100%;
+  max-width: 1100px;         /* Optional: limit row width for better centering on large screens */
 }
 
 .card {
-  background: white;
-  color: black;
+  background: linear-gradient(135deg, #1dd1a1 0%, #00d2a3 100%);
+  color: #fff;
   padding: 1rem;
   border-radius: 8px;
   flex: 1 1 240px;
   min-width: 200px;
+  box-shadow: 0 4px 16px rgba(29, 209, 161, 0.10);
+  border: none;
 }
 
 .label {
@@ -70,6 +86,7 @@ h1 {
 .value {
   font-size: 1.5rem;
   font-weight: bold;
+  color: #fff;
 }
 
 .charts {
@@ -78,27 +95,34 @@ h1 {
   gap: 2rem;
   margin-bottom: 2rem;
   width: 100%;
+  justify-content: center;
+  align-items: flex-start;
 }
+
 
 .chart-box {
   background: white;
   color: black;
   padding: 1rem;
   border-radius: 8px;
-  flex: 1 1 600px;
-  width: 100%;
+  flex: 1 1 400px;
+  min-width: 350px;
+  max-width: 500px;
+  min-height: 420px;
+  max-height: 420px;
   display: flex;
-  justify-content: center; 
-  align-items: center; 
-  gap: 2rem; 
+  flex-direction: column;
+  align-items: center;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 1s ease-out forwards;
+  box-sizing: border-box;
 }
 
+
 .chart-box h2 {
-  font-family: "Cabin Sketch", sans-serif;
-  font-size: 4rem;
+  font-family:  'Quicksand', sans-serif;
+  font-size: 2rem;
 }
 
 @keyframes fadeInUp {
@@ -113,13 +137,10 @@ h1 {
 }
 
 .table-section {
-  background: white;
-  color: black;
-  padding: 1rem;
-  border-radius: 8px;
-  overflow-x: auto;
-  width: 100%;
-  max-width: 100vw;
+  flex: 1 1 350px;
+  min-width: 350px;
+  max-width: '100%';
+  margin-bottom: 2rem;
 }
 
 table {
@@ -135,16 +156,26 @@ th, td {
 }
 
 .piechart-container {
-  display: flex;
-  align-items: center;
-  gap: 2rem; 
-  padding-bottom: 2rem;
-}
-
-.piechart-legend {
+  width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: -30px; /* Move chart upward */
+}
+.piechart-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 250px;
+  margin-top: -10px; /* Additional lift */
+  margin-bottom: -10px;
+
+}
+.piechart-legend {
+  display: flex;
   gap: 0.5rem; 
+  
 }
 
 .legend-item {

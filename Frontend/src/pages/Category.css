@@ -1,16 +1,19 @@
 /* src/pages/Categories.css */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
 
 .categories-page {
   min-height: 100vh;
   padding-top: 4rem;
-  background-color: white;
+  background-color: #F1FFF3;
   user-select: none;
+  font-family: 'Quicksand', sans-serif;
 }
 
 .categories-header h1 {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1rem;
+  font-family: 'Quicksand', sans-serif;
 }
 
 .categories-nav {
@@ -58,6 +61,7 @@
 }
 
 .categories-month button {
+  font-family: 'Quicksand', sans-serif;
   margin-top: 1rem;
   background-color: #808080;
   color: #fff;
@@ -80,6 +84,7 @@
   padding: 1.5rem 1rem;
   width: 100%;
   box-sizing: border-box;
+  font-family: 'Quicksand', sans-serif;
 }
 
 .categories-title {

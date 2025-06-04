@@ -29,7 +29,7 @@ const Categories = () => {
   };
 
   const handleClick = (category) => {
-    navigate(`/category/${category.category}`, { state: category });
+    navigate(`/category/₱{category.category}`, { state: category });
   };
 
   const filteredCategories = categories.filter(category =>
@@ -99,7 +99,7 @@ const Categories = () => {
               )}
               <div className="info">
                 <h3>{cat.category}</h3>
-                <p>${parseFloat(cat.limit).toLocaleString()}</p>
+                <p>₱{parseFloat(cat.limit).toLocaleString()}</p>
               </div>
             </div>
           ))}

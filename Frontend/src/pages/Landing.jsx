@@ -10,7 +10,7 @@ const Landing = () => {
       <h1 className="landing-title">WELCOME!</h1>
       <div className="landing-logo">
         <img
-          src="/src/assets/thrifttrail.png" 
+          src="/src/assets/ecowalletlogo.png" 
           alt="Thrift Trail Logo"
           className="logo-image"
         />

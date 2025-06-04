@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './register.css';
-import logoImage from '../assets/thrifttrail.png';
+import logoImage from '../assets/ecowalletlogo.png';
 import { FaRegEyeSlash } from 'react-icons/fa';
 import { IoEyeSharp } from 'react-icons/io5';
 

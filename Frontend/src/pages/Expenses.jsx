@@ -160,7 +160,7 @@ function App() {
           {filteredExpenses.map((e) => (
             <tr key={e.id}>
               <td>{e.title}</td>
-              <td>${parseFloat(e.amount).toLocaleString()}</td>
+              <td>₱{parseFloat(e.amount).toLocaleString()}</td>
               <td>{e.date}</td>
               <td>{e.type}</td>
               <td>{e.category}</td>

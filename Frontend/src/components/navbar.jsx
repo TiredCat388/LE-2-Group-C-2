@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import logo from "../assets/logo.png";
+import logo from "../assets/ecologo.png";
 import "./navbar.css";
 import {
   FaTachometerAlt,
@@ -79,7 +79,7 @@ const Navbar = () => {
     <div className="navbar">
       <div className="navbar-title">
         <img src={logo} alt="Logo" className="logo" />
-        Thrift Trail
+        EcoWallet
       </div>
 
       <div className="navbar-links">

@@ -39,7 +39,7 @@ function App() {
       processData(response.data);
     } catch (error) {
       setError("Failed to fetch entries");
-      console.error('Error fetching entries:', error);
+      console.error("Error fetching entries:", error);
     } finally {
       setLoading(false);
     }
@@ -47,56 +47,60 @@ function App() {
 
   const processData = (entries) => {
     // Filter entries for the selected month
-    const monthEntries = entries.filter(entry => 
+    const monthEntries = entries.filter((entry) =>
       entry.date.startsWith(month)
     );
 
     // Calculate summary data
     const totalExpenses = monthEntries
-      .filter(entry => entry.type === 'expense')
+      .filter((entry) => entry.type === "expense")
       .reduce((sum, entry) => sum + parseFloat(entry.amount), 0);
 
     const totalIncome = monthEntries
-      .filter(entry => entry.type === 'income')
+      .filter((entry) => entry.type === "income")
       .reduce((sum, entry) => sum + parseFloat(entry.amount), 0);
 
     const savings = totalIncome - totalExpenses;
 
     setSummaryData([
-      { label: "Monthly Expenses", value: `$${totalExpenses.toFixed(2)}` },
-      { label: "Monthly Income", value: `$${totalIncome.toFixed(2)}` },
-      { label: "Monthly Savings", value: `$${savings.toFixed(2)}` },
-      { 
-        label: "Savings Rate", 
-        value: totalIncome === 0 
-          ? '0%' 
-          : `${((savings / totalIncome) * 100).toFixed(1)}%` 
+      { label: "Monthly Expenses", value: `₱${totalExpenses.toFixed(2)}` },
+      { label: "Monthly Income", value: `₱${totalIncome.toFixed(2)}` },
+      { label: "Monthly Savings", value: `₱${savings.toFixed(2)}` },
+      {
+        label: "Savings Rate",
+        value:
+          totalIncome === 0
+            ? "0%"
+            : `${((savings / totalIncome) * 100).toFixed(1)}%`,
       },
     ]);
 
     // Process pie chart data (expenses by category)
     const categoryTotals = {};
     monthEntries
-      .filter(entry => entry.type === 'expense')
-      .forEach(entry => {
-        categoryTotals[entry.category] = (categoryTotals[entry.category] || 0) + parseFloat(entry.amount);
+      .filter((entry) => entry.type === "expense")
+      .forEach((entry) => {
+        categoryTotals[entry.category] =
+          (categoryTotals[entry.category] || 0) + parseFloat(entry.amount);
       });
 
-    const pieChartData = Object.entries(categoryTotals).map(([name, value]) => ({
-      name,
-      value: parseFloat(value.toFixed(2))
-    }));
+    const pieChartData = Object.entries(categoryTotals).map(
+      ([name, value]) => ({
+        name,
+        value: parseFloat(value.toFixed(2)),
+      })
+    );
 
     setPieData(pieChartData);
 
     // Process line chart data (monthly trends)
     const monthlyData = {};
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       const month = entry.date.slice(0, 7);
       if (!monthlyData[month]) {
         monthlyData[month] = { income: 0, expenses: 0 };
       }
-      if (entry.type === 'income') {
+      if (entry.type === "income") {
         monthlyData[month].income += parseFloat(entry.amount);
       } else {
         monthlyData[month].expenses += parseFloat(entry.amount);
@@ -107,7 +111,7 @@ function App() {
       name: month,
       Income: data.income,
       Expenses: data.expenses,
-      Savings: data.income - data.expenses
+      Savings: data.income - data.expenses,
     }));
 
     setLineData(lineChartData);
@@ -115,8 +119,8 @@ function App() {
     // Process table data
     const tableChartData = Object.entries(monthlyData).map(([month, data]) => ({
       month,
-      expenses: `$${data.expenses.toFixed(2)}`,
-      savings: `$${(data.income - data.expenses).toFixed(2)}`
+      expenses: `₱${data.expenses.toFixed(2)}`,
+      savings: `₱${(data.income - data.expenses).toFixed(2)}`,
     }));
 
     setTableData(tableChartData);
@@ -125,14 +129,22 @@ function App() {
   const handleMouseEnter = (index) => {
     setHoveredIndex(index);
   };
-  
+
   const handleMouseLeave = () => {
     setHoveredIndex(null);
   };
 
   const COLORS = [
-    "#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AB47BC",
-    "#26A69A", "#FFA726", "#EF5350", "#78909C", "#8D6E63"
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#AB47BC",
+    "#26A69A",
+    "#FFA726",
+    "#EF5350",
+    "#78909C",
+    "#8D6E63",
   ];
 
   if (loading) {
@@ -155,7 +167,7 @@ function App() {
 
   return (
     <div className="app">
-      <Navbar /> 
+      <Navbar />
       <div className="summary-container">
         <h1>Summary of Expenses</h1>
         <input
@@ -172,99 +184,116 @@ function App() {
             </div>
           ))}
         </div>
-        <div className="charts">
-          <div className="chart-box">
-            <h2>Monthly Trends</h2>
-            <LineChart width={500} height={260} data={lineData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="Income"
-                stroke="#8884d8"
-                animationDuration={1500}
-              />
-              <Line
-                type="monotone"
-                dataKey="Expenses"
-                stroke="#82ca9d"
-                animationDuration={1500}
-              />
-              <Line
-                type="monotone"
-                dataKey="Savings"
-                stroke="#ff6384"
-                animationDuration={1500}
-              />
-            </LineChart>
-          </div>
-
-          <div className="chart-box">
-            <h2>Spending Breakdown</h2>
-            <div className="piechart-container">
-              <ResponsiveContainer width={300} height={400}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    onMouseEnter={(data, index) => handleMouseEnter(index)}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={hoveredIndex === null || hoveredIndex === index ? COLORS[index % COLORS.length] : "#ccc"}
-                      />
-                    ))}
-                  </Pie>
+        {/* New row for charts and table side by side */}
+        <div className="summary-content-row">
+          <div className="charts">
+            <div className="chart-box">
+              <h2>Monthly Trends</h2>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                }}
+              >
+                <LineChart width={500} height={260} data={lineData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
                   <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="piechart-legend">
-                {pieData.map((entry, i) => (
-                  <div key={i} className="legend-item">
-                    <span
-                      className="legend-color"
-                      style={{ backgroundColor: COLORS[i % COLORS.length] }}
-                    ></span>
-                    {entry.name} ${entry.value.toLocaleString()}
-                  </div>
-                ))}
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="Income"
+                    stroke="#8884d8"
+                    animationDuration={1500}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="Expenses"
+                    stroke="#82ca9d"
+                    animationDuration={1500}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="Savings"
+                    stroke="#ff6384"
+                    animationDuration={1500}
+                  />
+                </LineChart>
+              </div>
+            </div>
+            <div className="chart-box">
+              <h2 className="chart-title">Spending Breakdown</h2>
+              <div className="piechart-container">
+                <div className="piechart-wrapper">
+                  <ResponsiveContainer width={300} height={250}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        onMouseEnter={(data, index) => handleMouseEnter(index)}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={
+                              hoveredIndex === null || hoveredIndex === index
+                                ? COLORS[index % COLORS.length]
+                                : "#ccc"
+                            }
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="piechart-legend">
+                  {pieData.map((entry, i) => (
+                    <div key={i} className="legend-item">
+                      <span
+                        className="legend-color"
+                        style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                      ></span>
+                      {entry.name} ${entry.value.toLocaleString()}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="table-section">
-          <h2>Monthly Overview</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Month</th>
-                <th>Expenses</th>
-                <th>Savings</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.map((row, i) => (
-                <tr key={i}>
-                  <td>{row.month}</td>
-                  <td>{row.expenses}</td>
-                  <td>{row.savings}</td>
+          <div className="table-section">
+            <h2>Monthly Overview</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Expenses</th>
+                  <th>Savings</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {tableData.map((row, i) => (
+                  <tr key={i}>
+                    <td>{row.month}</td>
+                    <td>{row.expenses}</td>
+                    <td>{row.savings}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-export default App;
+export default App; 
