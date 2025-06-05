@@ -94,7 +94,7 @@ const CategoryDetail = () => {
           <div className="category-info">
             <h2 className="category-title">{category.title}</h2>
             <p className="category-description">
-              Your monthly limit for <span>{category.category}</span> is <span>${category.limit}</span>, and you have spent <span>${totalSpent}</span>.
+              Your monthly limit for <span>{category.category}</span> is <span>₱{category.limit}</span>, and you have spent <span>₱{totalSpent}</span>.
             </p>
             <div className="budget-section">
               <label>Budget Remaining</label>
@@ -104,7 +104,7 @@ const CategoryDetail = () => {
                   style={{ width: `${Math.min((totalSpent / category.limit) * 100, 100)}%` }}
                 ></div>
               </div>
-              <span className="budget-amount">${(category.limit - totalSpent).toFixed(2)}</span>
+              <span className="budget-amount">₱{(category.limit - totalSpent).toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -130,7 +130,7 @@ const CategoryDetail = () => {
                 {entries.map((entry) => (
                   <tr key={entry.id}>
                     <td>{entry.title}</td>
-                    <td>${entry.amount}</td>
+                    <td>₱{entry.amount}</td>
                     <td>{entry.date}</td>
                   </tr>
                 ))}
@@ -167,7 +167,7 @@ const CategoryDetail = () => {
           />
           <label>Amount</label>
           <div className="input-group">
-            <span className="currency-prefix">$</span>
+            <span className="currency-prefix">₱</span>
             <input
               type="number"
               placeholder="0.00"

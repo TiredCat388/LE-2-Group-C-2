@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./login.css";
-import logoImage from "../assets/thrifttrail.png";
+import logoImage from "../assets/ecowalletlogo.png";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { IoEyeSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -74,13 +74,13 @@ const Login = () => {
     <div className="login-container">
       <div className="left-panel">
         <div className="branding">
-          <img src={logoImage} alt="money target" className="logo-image" />
+          <img src={logoImage} alt="EcoWallet Logo" className="chart-icon" />
         </div>
       </div>
 
       <div className="right-panel">
         <form className="login-form" onSubmit={handleSubmit}>
-          <h1>Login</h1>
+          <h1>Hello, welcome back!</h1>
           {error && <div className="error-message">{error}</div>}
           <input
             id="email"

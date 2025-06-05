@@ -146,7 +146,7 @@ function BudgetTab() {
               <tr key={i}>
                 <td>{i + 1}</td>
                 <td>{item.category}</td>
-                <td>${parseFloat(item.limit).toLocaleString()}</td>
+                <td>₱{parseFloat(item.limit).toLocaleString()}</td>
                 <td>
                   <button
                     className="action-btn update"
@@ -190,7 +190,7 @@ function BudgetTab() {
 
               <label>Monthly Limit</label>
               <div className="input-group">
-                <span className="currency-prefix">$</span>
+                <span className="currency-prefix">₱</span>
                 <input
                   type="number"
                   value={newLimit}
